@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title> Notes </title>
+</head>
+<body>
+  <h1>New Note</h1>
+  <form action="/send_note" method="post">
+    <label for="ntitle">Title:</label><br>
+    <input type="text" id="ntitle" name="ntitle"><br>
+	<label for="nbody">Body:</label><br>
+    <textarea type="text" id="nbody" name="nbody" rows="5" cols="40"></textarea><br>
+    <input type="submit" value="Submit">
+  </form>
+  <h1> Notes </h1>
+  <div id='note_list'></div>
+  <script>
+  // Fetch data via requests
+  fetch('/notes')
+    .then(response => response.json())
+    .then(data => {
+    const noteList = data.map(
+      note => `<li> ${note.note_id} : ${note.title} - ${note.body}</li>`
+    ).join('');
+    document.getElementById('note_list').innerHTML = `<ul>${noteList}</ul>`;
+  })
+    .catch(error => console.error('Error occurred:', error));
+  </script>
+</body>
+</html>
