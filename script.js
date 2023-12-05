@@ -41,29 +41,6 @@ function render(filename, data) {
     return output;
 }
 
-
-
-/*
-
-const query = "SELECT json_agg(notes) AS notes FROM notes;";
-	pool.query(query, (error, results) => {
-		if (error) {
-			console.error('Error occurred:', error);
-			//res.status(500).send('An error occurred while retrieving data from the postgres database.');
-		} else {
-			results = results.rows[0];
-			var complete = render(path.join(__dirname, '', 'index.html'), results);
-			console.log(complete);
-			//res.json(notes);
-		}
-	});
-	
-
-*/
-
-
-
-
 // Recieve a note from the user
 app.post('/send_note', function(req, res) {
     var title = req.body.ntitle;
@@ -119,33 +96,11 @@ app.get('/notes', (req, res) => {
 			//res.status(500).send('An error occurred while retrieving data from the postgres database.');
 		} else {
 			result = result.rows[0];
-			result = render(path.join(__dirname, '', 'index.html'), result);
+			result = render(path.join(__dirname, '', 'notes.html'), result);
 			res.send(result);
 		}
 	});
 });
-
-
-app.get('/login', (req, res) => {
-  console.log("where do I see this text??");
-});
-
-/*
-// Route handler for GET note data
-app.get('/notes', (req, res) => {
-  const query = 'SELECT * FROM notes ORDER BY note_id DESC;';
-
-  pool.query(query, (error, result) => {
-    if (error) {
-      console.error('Error occurred:', error);
-      res.status(500).send('An error occurred while retrieving data from the postgres database.');
-    } else {
-      const notes = result.rows;
-      res.json(notes);
-    }
-  });
-});
-*/
 
 // Setup Route handler
 app.get('/contacts', (req, res) => {
