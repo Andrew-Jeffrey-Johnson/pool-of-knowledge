@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title> People </title>
+</head>
+<body>
+  <h1><a href="/">Notes</a></h1>
+  <h1> Add Person </h1>
+  <form action="/add_person" method="post">
+    <label for="fname">First Name:</label><br>
+    <input type="text" id="fname" name="fname"><br>
+	<label for="mname">Middle Name:</label><br>
+    <input type="text" id="mname" name="mname"><br>
+	<label for="lname">Last Name:</label><br>
+    <input type="text" id="lname" name="lname"><br>
+	<label for="wemail">Work Email:</label><br>
+    <input type="text" id="wemail" name="wemail"><br>
+	<label for="pemail">Personal Email:</label><br>
+    <input type="text" id="pemail" name="pemail"><br>
+	<label for="wphone">Work Phone Number:</label><br>
+    <input type="text" id="wphone" name="wphone"><br>
+	<label for="pphone">Personal Phone Number:</label><br>
+    <input type="text" id="pphone" name="pphone"><br>
+	<label for="address">Address:</label><br>
+    <input type="text" id="address" name="address"><br>
+    <input type="submit" value="Submit">
+  </form>
+  <h1> People </h1>
+  <div id='people_list'></div>
+  <script>
+  // Fetch data via requests
+  fetch('/people')
+    .then(response => response.json())
+    .then(data => {
+    const peopleList = data.map(
+      person => `<li> ${person.id} : ${person.fname} ${person.mname} ${person.lname} ${person.wemail} ${person.pemail} ${person.wphone} ${person.pphone} ${person.address}</li>`
+    ).join('');
+    document.getElementById('people_list').innerHTML = `<ul>${peopleList}</ul>`;
+  })
+    .catch(error => console.error('Error occurred:', error));
+  </script>
+</body>
+</html>

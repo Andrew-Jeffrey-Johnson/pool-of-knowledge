@@ -8,7 +8,7 @@ const bodyParser = require('body-parser');
 var app = express();
 const port = 3000; // By default, its 3000, you can customize
 
-// Create a Postgres Connection
+// Create a Postgres Connection for Postgres database
 const pool = new Pool({
   user: 'postgres',
   host: 'localhost',
@@ -17,10 +17,20 @@ const pool = new Pool({
   port: 5432, // Default Port
 });
 
+// Create a Postgres Connection for pok database
+const pok = new Pool({
+  user: 'postgres',
+  host: 'localhost',
+  database: 'pok',
+  password: 'a', // Change to your password
+  port: 5432, // Default Port
+});
+
 app.use(express.static(path.join('')));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+// Recieve a note from the user
 app.post('/send_note', function(req, res) {
     var title = req.body.ntitle;
     var body = req.body.nbody;
@@ -38,23 +48,66 @@ app.post('/send_note', function(req, res) {
     });
 });
 
+// Recieve a new contact from the user
+app.post('/add_person', function(req, res) {
+    var fname = req.body.fname;
+	var mname = req.body.mname;
+    var lname = req.body.lname;
+	var wemail = req.body.wemail;
+	var pemail = req.body.pemail;
+	var wphone = req.body.wphone;
+	var pphone = req.body.pphone;
+	var address = req.body.address;
+
+    const query = 'INSERT INTO People(fname, mname, lname, wemail, pemail, wphone, pphone, address) VALUES($1, $2, $3, $4, $5, $6, $7, $8)';
+    const values = [fname, mname, lname, wemail, pemail, wphone, pphone, address];
+
+    pok.query(query, values, (error, result) => {
+        if (error) {
+            console.error('Error occurred:', error);
+            res.status(500).send('An error occurred while inserting data into the database.');
+        } else {
+            res.redirect('/contacts');
+        }
+    });
+});
 
 // Setup Route handler
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '', 'index.html'));
 });
 
-// Route handler for GET student data
+// Route handler for GET note data
 app.get('/notes', (req, res) => {
   const query = 'SELECT * FROM notes ORDER BY note_id DESC;';
 
   pool.query(query, (error, result) => {
     if (error) {
       console.error('Error occurred:', error);
-      res.status(500).send('An error occurred while retrieving data from the database.');
+      res.status(500).send('An error occurred while retrieving data from the postgres database.');
     } else {
-      const students = result.rows;
-      res.json(students);
+      const notes = result.rows;
+      res.json(notes);
+    }
+  });
+});
+
+// Setup Route handler
+app.get('/contacts', (req, res) => {
+  res.sendFile(path.join(__dirname, '', 'contacts.html'));
+});
+
+// Route handler for GET people data
+app.get('/people', (req, res) => {
+  const query = 'SELECT * FROM People ORDER BY id DESC;';
+
+  pok.query(query, (error, result) => {
+    if (error) {
+      console.error('Error occurred:', error);
+      res.status(500).send('An error occurred while retrieving data from the pok database.');
+    } else {
+      const people = result.rows;
+      res.json(people);
     }
   });
 });
