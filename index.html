@@ -16,18 +16,10 @@
     <input type="submit" value="Submit">
   </form>
   <h1> Notes </h1>
-  <div id='note_list'></div>
-  <script>
-  // Fetch data via requests
-  fetch('/notes')
-    .then(response => response.json())
-    .then(data => {
-    const noteList = data.map(
-      note => `<li> ${note.note_id} : ${note.title} - ${note.body}</li>`
-    ).join('');
-    document.getElementById('note_list').innerHTML = `<ul>${noteList}</ul>`;
-  })
-    .catch(error => console.error('Error occurred:', error));
-  </script>
+	<ul>
+		{{#each notes}}
+		<li>{{this.note_id}} - {{this.title}}: {{this.body}}</li>
+		{{/each}}
+	</ul>
 </body>
 </html>

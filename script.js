@@ -3,6 +3,9 @@ const express = require('express');
 const { Pool } = require('pg');
 const path = require('path');
 const bodyParser = require('body-parser');
+const fs = require('fs');
+const handlebars = require("handlebars");
+
 
 // Connect and Create an Express Application
 var app = express();
@@ -30,6 +33,37 @@ app.use(express.static(path.join('')));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+// Function to read HTML file and compile it with handlebars
+function render(filename, data) {
+    var source = fs.readFileSync(filename, 'utf8').toString();
+    var template = handlebars.compile(source);
+    var output = template(data);
+    return output;
+}
+
+
+
+/*
+
+const query = "SELECT json_agg(notes) AS notes FROM notes;";
+	pool.query(query, (error, results) => {
+		if (error) {
+			console.error('Error occurred:', error);
+			//res.status(500).send('An error occurred while retrieving data from the postgres database.');
+		} else {
+			results = results.rows[0];
+			var complete = render(path.join(__dirname, '', 'index.html'), results);
+			console.log(complete);
+			//res.json(notes);
+		}
+	});
+	
+
+*/
+
+
+
+
 // Recieve a note from the user
 app.post('/send_note', function(req, res) {
     var title = req.body.ntitle;
@@ -43,7 +77,7 @@ app.post('/send_note', function(req, res) {
             console.error('Error occurred:', error);
             res.status(500).send('An error occurred while inserting data into the database.');
         } else {
-            res.redirect('/');
+            res.redirect('/notes');
         }
     });
 });
@@ -74,9 +108,29 @@ app.post('/add_person', function(req, res) {
 
 // Setup Route handler
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, '', 'index.html'));
+	res.redirect('/notes');
+});
+app.get('/notes', (req, res) => {
+	console.log("hello?");
+	const query = "SELECT json_agg(notes) AS notes FROM notes;";
+	pool.query(query, (error, result) => {
+		if (error) {
+			console.error('Error occurred:', error);
+			//res.status(500).send('An error occurred while retrieving data from the postgres database.');
+		} else {
+			result = result.rows[0];
+			result = render(path.join(__dirname, '', 'index.html'), result);
+			res.send(result);
+		}
+	});
 });
 
+
+app.get('/login', (req, res) => {
+  console.log("where do I see this text??");
+});
+
+/*
 // Route handler for GET note data
 app.get('/notes', (req, res) => {
   const query = 'SELECT * FROM notes ORDER BY note_id DESC;';
@@ -91,6 +145,7 @@ app.get('/notes', (req, res) => {
     }
   });
 });
+*/
 
 // Setup Route handler
 app.get('/contacts', (req, res) => {
